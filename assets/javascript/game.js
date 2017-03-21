@@ -1,25 +1,40 @@
 $(document).ready(function() {
 
 
-var topics = ["happy", "sad", "annoyed", "angry", "facepalm"];
+var topics = ["happy", "sad", "bored", "excited", "annoyed", "angry", "facepalm"];
 var gifButtonId = 0; // for setting buttonIDs, will increment whenever a gif button is created
 
+// creates a gif search button
 function create_gif_button(gifTopic) {
     
     var gifButton = $("<button>") 
     gifButton.attr("data-gif", gifTopic);
     gifButton.text(gifTopic);
     gifButton.attr("id", 'btn_'+gifButtonId);
-    gifButtonId++; // in this function instead of in for loop so that additional buttons can be made with incremental ids
+    gifButton.attr("class", "gifSearchButton");
+    gifButtonId++; // in this function instead of in for loop so that additional buttons can be made with incremental ids.
     $("#gif-buttons-here").append(" ");
     $("#gif-buttons-here").append(gifButton);
 }
 
+// creates initial set of gif search buttons
 for (var i =0; i < topics.length; i++) {
     create_gif_button(topics[i]);
 }
 
-$("button").on("click", function() {
+// adds search button according to text input
+$(document).on("click", "#gif-search-submit", function(event) {
+    event.preventDefault();
+    var gifTopic = $("#gif-search-term").val().trim();
+    $("#gif-search-term").val("");
+    if (gifTopic !== ""){
+        topics.push(gifTopic); // not strictly necessary, but in case want to reload all buttons
+        create_gif_button(gifTopic);
+    }
+});
+
+// buttons search using giphy api, limited to 10 gifs that start off frozen and can be clicked to animate
+$(document).on("click", ".gifSearchButton", function() {
     var gifSearch = $(this).attr("data-gif");
     var queryURL = "http://api.giphy.com/v1/gifs/search?q=" + gifSearch + "&api_key=dc6zaTOxFJmzC&limit=10";
 
@@ -53,7 +68,10 @@ $("button").on("click", function() {
             }
     });
 });
+
+//freezes/unfreezes gifs when clicked
  $(document).on("click", ".gif", function() {
+
       var state = $(this).attr("data-state");
 
       console.log(state);
